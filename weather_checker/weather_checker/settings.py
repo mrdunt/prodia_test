@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-#c#=)b9yu5-@kzi2$6(5(ynxjtc9m5%6fr&cgn^*$j!$f%6!q0'
+SECRET_DIRECTORY = 'weather_checker-secrets'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

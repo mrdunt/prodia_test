@@ -1,0 +1,238 @@
+{% load static %}
+<!-- Modal Select -->
+<div class="modal fade text-left modal-borderless" id="modal-select" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title"></h4>
+                <button type="button" class="close rounded-pill"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center" id="loading-select">
+                    <em class="fas fa-spinner fa-spin fa-4x text-primary"></em>
+                </div>
+                
+                <div class="d-none div-table-custom" id="table-select">
+                    <em class="fas fa-spinner fa-spin fa-4x text-primary loading-table"></em>
+                    <div class="row justify-content-end mb-4">
+                        <div class="col-md-5">
+                            <div class="form-group has-icon-left">
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" placeholder="Cari Nama" id="search-select" onkeyup="searchNameSelect(this.value)">
+                                    <div class="form-control-icon">
+                                        <em class="bi bi-search"></em>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th id="nama">Nama</th>
+                                <th id="kode">Kode</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-table-select"></tbody>
+                    </table>
+                    <nav class="mt-3">
+                        <ul class="pagination pagination-primary justify-content-end mb-0">
+                            <li class="page-item page-next-prev c-pointer" id="page-prev-select">
+                                <a class="page-link">Previous</a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" id="current-page-select">1</a>
+                            </li>
+                            <li class="page-item page-next-prev c-pointer" id="page-next-select">
+                                <a class="page-link">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/js/helpers.js" %}"></script>
+    <script>
+        let page = ""
+        let param = ""
+        let url_select = ""
+        let id_modal = ""
+        let name_modal = ""
+        let type_modal = ""
+        let partner_id = ''
+
+        const parameter = new URLSearchParams({
+            name: '',
+            page: '',
+        })
+
+        // Function Show Modal
+        function showModal(data){
+            modalSelect.show()
+            resetModalSelect()
+
+            id_modal = data.id_id
+            name_modal = data.id_name
+            type_modal = data.value
+            param = data.param != '' ? data.param : ''
+            url_select = data.param != '' ? data.url + data.param : data.url
+
+            document.getElementById("modal-title").innerHTML = `Pilih ${data.value}`
+            document.getElementById("kode").innerHTML = `Kode ${data.value}`
+
+            if (id_modal == 'id_partner'){
+                document.getElementById('id_store').value = ''
+                document.getElementById('id_name_store').value = ''
+            }
+
+            // Fetch API
+            getapiselect(url_select);
+        }
+
+        // Function Set URL Params
+        function setUrlSelect(){
+            cleanParams(parameter)
+            return `${url_select}${param == '' ? '?' : '&'}${parameter.toString()}`
+        }
+
+        // Function Fetch API
+        async function getapiselect(url) {
+            const response = await fetch(url)
+
+            if (response) {
+                var data = await response.json()
+
+                hideLoadingSelect()
+                unloadingTableSelect()
+
+                setTotableSelect(data[0])
+                paginationSelect(data[0].paginator)
+            }
+        }
+
+        // Function Add data to table
+        function setTotableSelect(data) {
+            let tab = ''
+            // Loop to access all rows 
+            for (let r of data.data) {
+                datas = Object.values(r)
+                tab += `
+                    <tr> 
+                        <td class="c-pointer" onclick="setSelected('${datas[0]}', '${datas[1]}', '${datas[2]}')">
+                            <a class="text-primary">${datas[1]}</a>
+                        </td>
+                        <td>${datas[2]}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById("body-table-select").innerHTML = tab;
+        }
+
+        // Function pagination modal
+        function paginationSelect(paginator){
+            var pageNext = document.getElementById("page-next-select")
+            var pagePrev = document.getElementById("page-prev-select")
+            
+            // If Page Previous Available
+            if(paginator.previous){
+                pagePrev.setAttribute("onclick", "changePageSelect("+paginator.previous+")")
+                pagePrev.classList.remove("page-item-disabled", "disabled")
+            }else{
+                pagePrev.removeAttribute("onclick")
+                pagePrev.classList.add("page-item-disabled", "disabled")
+            }
+            // If Page Next Available
+            if(paginator.next){
+                pageNext.setAttribute("onclick", "changePageSelect("+paginator.next+")")
+                pageNext.classList.remove("page-item-disabled", "disabled")
+            }else{
+                pageNext.removeAttribute("onclick")
+                pageNext.classList.add("page-item-disabled", "disabled")
+            }
+        }
+
+        // Function Change Page List
+        function changePageSelect(value){
+            page = value
+            parameter.set('page', value)
+            
+            loadingTableSelect()
+            getapiselect(setUrlSelect())
+            document.getElementById("current-page-select").innerHTML = page
+        }
+        
+
+        // function search
+        function searchNameSelect(value){
+            if (event.keyCode === 13) {
+                page = 1
+                parameter.set('name', value)
+                parameter.set('page', 1)
+
+                document.getElementById("current-page-select").innerHTML = page
+                
+                loadingTableSelect()
+                getapiselect(setUrlSelect())
+            }
+        }
+
+        // Function set selected
+        function setSelected(id, name, code) {
+            document.getElementById(id_modal).value = id
+            document.getElementById(name_modal).value = name
+            partner_id = id
+
+            if (type_modal) setNextUrl(code)
+
+            modalSelect.hide()
+        }
+
+        // Function set url modal city & district
+        function setNextUrl(code){
+            if(type_modal == 'Partner'){
+                document.getElementById("btn_store").setAttribute('data-param', `?partner=${partner_id}`)
+                document.getElementById("id_name_store").removeAttribute('disabled')
+                document.getElementById("btn_store").removeAttribute('disabled')
+            }
+        }
+
+        // Function reset when load modal
+        function resetModalSelect(){
+            document.getElementById("body-table-select").innerHTML = ''
+            document.getElementById("current-page-select").innerHTML = 1
+            document.getElementById("search-select").value = ''
+            parameter.set('name', '')
+            parameter.set('page', '')
+            showLoadingSelect()
+        }
+
+        // Function Hide Loading
+        function hideLoadingSelect(){
+            document.getElementById('loading-select').classList.add("d-none")
+            document.getElementById('table-select').classList.remove("d-none")
+        }
+
+        // Function Show Loading
+        function showLoadingSelect(){
+            document.getElementById('loading-select').classList.remove("d-none")
+            document.getElementById('table-select').classList.add("d-none")
+        }
+
+        // Function Loading Table
+        function loadingTableSelect(){
+            document.getElementById('table-select').classList.add("div-loading")
+        }
+
+        // Function Loading Table
+        function unloadingTableSelect(){
+            document.getElementById('table-select').classList.remove("div-loading")
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% if user.is_superuser or user.is_supervisor %}
+    <div class="col-md-4">
+        <div class="form-group mb-4">
+            <div class="input-group">
+                <input type="text" class="d-none" id="id_partner" name="partner" value="{{ query_filter.partner_id }}">
+                <input type="text" class="form-control" id="id_name_partner" placeholder="Filter Partner" value="{{ query_filter.partner }}">
+                <button id="btn_partner" class="btn btn-outline-primary" type="button" onclick="showModal({id_id:'id_partner',id_name:'id_name_partner', value:'Partner', url:this.dataset.url, param:''})">Show List</button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<div class="col-md-4">
+    <div class="form-group mb-4">
+        <div class="input-group">
+            <input type="text" class="d-none" name="store" id="id_store" value="{{ query_filter.store_id }}">
+            <input type="text" class="form-control" id="id_name_store" placeholder="Filter Store" value="{{ query_filter.store }}">
+            <button id="btn_store" class="btn btn-outline-primary" type="button" onclick="showModal({id_id:'id_store',id_name:'id_name_store', value:'Store', url:this.dataset.url, param:(this.dataset.param)? this.dataset.param:''})">Show List</button>
+        </div>
+    </div>
+</div>

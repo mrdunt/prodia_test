@@ -1,0 +1,228 @@
+{% load static %}
+
+<!-- Modal Select Popup -->
+<div class="modal fade text-left modal-borderless" id="modal-popup" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title">{{title}}</h4>
+                <button type="button" class="close rounded-pill"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center" id="loading">
+                    <i class="fas fa-spinner fa-spin fa-4x text-primary"></i>
+                </div>
+                
+                <div class="d-none div-table-custom" id="table-popup">
+                    <i class="fas fa-spinner fa-spin fa-4x text-primary loading-table"></i>
+                    <div class="row justify-content-end mb-4">
+                        <div class="col-md-5">
+                            <div class="form-group has-icon-left">
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" placeholder="Cari Berdasarkan Nama" id="search" onkeyup="searchName(this.value)">
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% for head in header %}
+                                    <th>{{head}}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="body-table"></tbody>
+                    </table>
+
+                    <nav class="mt-3">
+                        <ul class="pagination pagination-primary justify-content-end mb-0">
+                            <li class="page-item page-next-prev c-pointer" id="page-prev">
+                                <a class="page-link">Previous</a>
+                            </li>
+                
+                            <li class="page-item active">
+                                <a class="page-link" id="current-page">1</a>
+                            </li>
+                            
+                            <li class="page-item page-next-prev c-pointer" id="page-next">
+                                <a class="page-link">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/js/helpers.js" %}"></script>
+    <script>
+        let page = ""
+        let url = ""
+        let id_modal = ""
+        let name_modal = ""
+        let title_modal = ""
+
+        const params = new URLSearchParams({
+            name: '',
+            page: '',
+        })
+
+        // Function Show Modal Popup
+        function showModal(data){
+            resetModal()
+            modalPopup.show()
+
+            id_modal = data.id_id
+            name_modal = data.id_name
+            url = data.url
+            document.getElementById("modal-title").innerHTML = data.title
+
+            // Fetch API
+            getapi(url);
+        }
+
+        // Function Set URL Params
+        function setUrl(){
+            cleanParams(params)
+            return `${url}?${params.toString()}`
+        }
+
+        // Function Fetch API
+        async function getapi(url) {
+            const response = await fetch(url)
+
+            if(response){
+                hideLoading()
+                unloadingTable()
+
+                var data = await response.json()
+                setTotable(data[0])
+                pagination(data[0].paginator)
+            }
+        }
+
+        // Function Add data to table
+        function setTotable(data) {
+            let tab = ''
+            
+            // Loop to access all rows 
+            for (let r of data.data) {
+                datas = Object.values(r)
+                tab += `
+                    <tr> 
+                        <td class="c-pointer" onclick="setSelected('${datas[0]}', '${datas[1]}')">
+                            <a class="text-primary">${datas[1] ? datas[1] : '-'}</a>
+                        </td>
+                        <td>${datas[2]}</td>
+                    `;
+                if(r.is_active != null) {
+                    if (r.is_active) {
+                        tab += `<td><span class="badge bg-light-success">Ya</span></td>`;
+                    } else {
+                        tab += `<td><span class="badge bg-light-danger">Tidak</span></td>`;
+                    }
+                }
+                tab += `</tr>`;
+            }
+            document.getElementById("body-table").innerHTML = tab;
+        }
+
+        // Function pagination modal
+        function pagination(paginator){
+            var pageNext = document.getElementById("page-next")
+            var pagePrev = document.getElementById("page-prev")
+            
+            // If Page Previous Available
+            if(paginator.previous){
+                pagePrev.setAttribute("onclick", "changePage("+paginator.previous+")")
+                pagePrev.classList.remove("page-item-disabled", "disabled")
+            }else{
+                pagePrev.removeAttribute("onclick")
+                pagePrev.classList.add("page-item-disabled", "disabled")
+            }
+
+            // If Page Next Available
+            if(paginator.next){
+                pageNext.setAttribute("onclick", "changePage("+paginator.next+")")
+                pageNext.classList.remove("page-item-disabled", "disabled")
+            }else{
+                pageNext.removeAttribute("onclick")
+                pageNext.classList.add("page-item-disabled", "disabled")
+            }
+        }
+
+        // Function Change Page List Popup
+        function changePage(value){
+            page = value
+            params.set('page', value)
+            
+            loadingTable()
+            getapi(setUrl())
+            document.getElementById("current-page").innerHTML = page
+        }
+        
+
+        // function search Popup
+        function searchName(value){
+            if (event.keyCode === 13) {
+                page = 1
+                params.set('name', value)
+                params.set('page', 1)
+
+                document.getElementById("current-page").innerHTML = page
+                
+                loadingTable()
+                getapi(setUrl())
+            }
+        }
+
+        // Function set selected Popup
+        function setSelected(id, name){
+            document.getElementById(id_modal).value = id
+            document.getElementById(name_modal).value = name
+            modalPopup.hide()
+        }
+
+        // Function reset when load modal
+        function resetModal(){
+            document.getElementById("body-table").innerHTML = ''
+            document.getElementById("current-page").innerHTML = 1
+            document.getElementById("search").value = ''
+            params.set('name', '')
+            params.set('page', '')
+            showLoading()
+        }
+
+        // Function Hide Loading
+        function hideLoading(){
+            document.getElementById('loading').classList.add("d-none")
+            document.getElementById('table-popup').classList.remove("d-none")
+        }
+
+        // Function Show Loading
+        function showLoading(){
+            document.getElementById('loading').classList.remove("d-none")
+            document.getElementById('table-popup').classList.add("d-none")
+        }
+
+        // Function Loading Table
+        function loadingTable(){
+            document.getElementById('table-popup').classList.add("div-loading")
+        }
+
+        // Function Loading Table
+        function unloadingTable(){
+            document.getElementById('table-popup').classList.remove("div-loading")
+        }
+    </script>
+{% endblock %}

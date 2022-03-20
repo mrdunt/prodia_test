@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static "assets/css/font.css" %}">
+        <link rel="stylesheet" href="{% static "assets/css/bootstrap.css" %}">
+        <link rel="stylesheet" href="{% static "assets/vendors/bootstrap-icons/bootstrap-icons.css" %}">
+        <link rel="stylesheet" href="{% static "assets/vendors/fontawesome/all.min.css" %}">
+        <link rel="stylesheet" href="{% static "assets/css/app.css" %}">
+        <link rel="stylesheet" href="{% static "assets/css/pages/auth.css" %}">
+        {% block styles %}{% endblock %}
+        <link rel="shortcut icon" href="{% static "assets/favicon.ico" %}" type="image/x-icon">
+    </head>
+
+    <body>
+        {% block content %}{% endblock %}
+
+        <!-- Floating WA -->
+        {% include "partials/floating-wa.html" %}
+        
+        <script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+        <script src="{% static "assets/vendors/fontawesome/all.min.js" %}"></script>
+        {% block js %}{% endblock %}
+    </body>
+</html>

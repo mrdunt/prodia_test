@@ -1,0 +1,47 @@
+{% load static %}
+
+<!-- Floating WA -->
+<button class="floating-wa" id="floatingWa" onclick="showPopupWhasapp()">
+    <img id="closeFloating" class="d-none" src="{% static "assets/icons/close-white.svg" %}" alt="close-icon">
+    <img id="waIcon" src="{% static "assets/icons/wa-icon.svg" %}" alt="wa-icon">
+</button>
+
+<!-- Popup Floating Whatsapp -->
+<div id="popupWa" class="popup-wa d-none">
+    <div class="header">
+        <p>Chat dengan kami di Whatsapp!</p>
+        <img src="{% static "assets/icons/close-white.svg" %}" alt="close-wa" onclick="showPopupWhasapp()">
+    </div>
+    <div class="hello-message">
+        <div class="message">Hi Gramedian, ada yang bisa kami bantu mengenai proses order dan pendaftaran ?</div>
+    </div>
+    <div class="set-message">
+        <textarea
+            id="waMessage"
+            name="wa-message"
+            class="input-message"
+            placeholder="Tulis pesan kamu.."
+        ></textarea>
+        <img src="{% static "assets/icons/send.svg" %}" alt="send-icon" onclick="sendWhastapp()">
+    </div>
+</div>
+
+{% block js %}
+    <script>
+        // Function Floating Button WhatsApp
+        const waIcon = document.getElementById("waIcon")
+        const popupWa = document.getElementById("popupWa")
+        const closeFloating = document.getElementById("closeFloating")
+        const waMessage = document.getElementById("waMessage")
+
+        function showPopupWhasapp() {
+            closeFloating.classList.toggle("d-none")
+            waIcon.classList.toggle("d-none")
+            popupWa.classList.toggle("d-none")
+        }
+        
+        function sendWhastapp() {
+            window.open(`https://api.whatsapp.com/send/?phone=628111450436&text=${waMessage.value}&app_absent=0`);
+        }
+    </script>
+{% endblock %}

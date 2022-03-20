@@ -9,9 +9,12 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import os
 
 from pathlib import Path
 from weather_checker.utils import get_credential
+from os import path
+from os.path import abspath, dirname, join
 
 
 AUTH_USER_MODEL = 'users.WeatherCheckerUser'
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'weather_checker.apps.areas',
     'weather_checker.apps.users',
+    'weather_checker.apps.user_loggings',
 ]
 
 MIDDLEWARE = [
@@ -57,11 +61,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'weather_checker.urls'
+DJANGO_ROOT = dirname(abspath(__file__))
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            path.join(DJANGO_ROOT, "templates"),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,6 +77,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'querystring': 'libraries.utils.templatetags.querystring',
+                'images': 'libraries.utils.templatetags.images',
+                'function': 'libraries.utils.templatetags.function'
+            }
         },
     },
 ]
@@ -129,7 +141,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = join(DJANGO_ROOT, 'static')
+SETTINGS_DIR = path.dirname(__file__)
+PROJECT_ROOT = path.dirname(SETTINGS_DIR)
+STATICFILES_DIRS = (
+    path.join(PROJECT_ROOT, 'static_files'),
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

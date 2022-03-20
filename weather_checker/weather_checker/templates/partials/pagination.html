@@ -1,0 +1,154 @@
+{% load  querystring %}
+
+{% if paginator.next or paginator.previous %}
+    <nav id="pagination" class="mt-5">
+        <ul class="pagination pagination-primary justify-content-end mb-0">
+            <li class="page-item page-next-prev" id="pagePrev">
+                <a class="page-link" href="{% if paginator.previous %}{% querystring 'page'=paginator.previous %}{% endif %}"><i class="fa fa-chevron-left"></i></a>
+            </li>
+
+            <li class="page-item" id="firstPage">
+                <a class="page-link" href="{% querystring 'page'=1 %}">1</a>
+            </li>
+            <li class="page-item" id="firstSeparator">
+                <a class="page-link">...</a>
+            </li>
+            <ul id="paginationList" class="pagination pagination-custom pagination-primary justify-content-end mb-0"></ul>
+            <li class="page-item" id="lastSeparator">
+                <a class="page-link">...</a>
+            </li>
+            <li class="page-item" id="lastPage">
+                <a class="page-link"></a>
+            </li>
+
+            <li class="page-item page-next-prev" id="pageNext">
+                <a class="page-link" href="{% if paginator.next %}{% querystring 'page'=paginator.next %}{% endif %}"><i class="fa fa-chevron-right"></i></a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}
+
+{% block js %}
+    <script>
+        // Variable
+        let currentPage = `{% if paginator.next or paginator.previous %}{% if not request.GET.page %}1{% else %}{{request.GET.page}}{% endif %}{% else %}none{% endif %}`
+        let currentPageToNumber = Number(currentPage)
+        let perPage = "{{paginator.step}}"
+        let total = "{{paginator.total_data}}"
+        let totalListPage = 0
+
+        let pagePrev = document.getElementById('pagePrev')
+        let pageNext = document.getElementById('pageNext')
+        let firstPage = document.getElementById('firstPage')
+        let lastPage = document.getElementById('lastPage')
+        let firstSeparator = document.getElementById('firstSeparator')
+        let lastSeparator = document.getElementById('lastSeparator')
+
+        // Create Pagination
+        if(currentPage != 'none'){
+            createPagination()
+        }
+
+        // Function Create Pagination
+        function createPagination() {
+            // Calculate total page
+            if(total) {
+                countLength()
+    
+                let pagination = ''
+                let firstlist = 0
+                let maxList = 0
+                let url = window.location.href.split('?')[0];
+                let querysearch = window.location.search.split('&')[0];
+                
+                if(currentPage != 'none') {
+                    if(totalListPage <= 4) {
+                        firstlist = 0
+                        maxList = totalListPage
+    
+                        firstPage.classList.add('d-none')
+                        firstSeparator.classList.add('d-none')
+    
+                        lastPage.classList.add('d-none')
+                        lastSeparator.classList.add('d-none')
+                    }else {
+                        if ((currentPageToNumber - 2) <= 0 && (currentPageToNumber + 1) <= totalListPage) {
+                            firstlist = 0
+                            maxList = 4
+            
+                            firstPage.classList.add('d-none')
+                            firstSeparator.classList.add('d-none')
+            
+                            lastPage.classList.remove('d-none')
+                            lastSeparator.classList.remove('d-none')
+            
+                            lastPage.querySelector('.page-link').innerHTML = totalListPage
+                            lastPage.querySelector('.page-link').href = (querysearch) ? `${url}${querysearch}&page=${totalListPage}` : `${url}?page=${totalListPage}`
+                        }
+                        else if ((currentPageToNumber - 2) > 0 && (currentPageToNumber + 1) < totalListPage) {
+                            firstlist = currentPageToNumber - 2
+                            maxList = currentPageToNumber + 1
+            
+                            firstPage.classList.remove('d-none')
+                            firstSeparator.classList.remove('d-none')
+            
+                            lastPage.classList.remove('d-none')
+                            lastSeparator.classList.remove('d-none')
+            
+                            lastPage.querySelector('.page-link').innerHTML = totalListPage
+                            lastPage.querySelector('.page-link').href = (querysearch) ? `${url}${querysearch}&page=${totalListPage}` : `${url}?page=${totalListPage}`
+                        }
+                        else if ((currentPageToNumber - 2) > 0 && (currentPageToNumber + 1) >= totalListPage) {
+                            firstlist = totalListPage - 4
+                            maxList = totalListPage
+            
+                            firstPage.classList.remove('d-none')
+                            firstSeparator.classList.remove('d-none')
+            
+                            lastPage.classList.add('d-none')
+                            lastSeparator.classList.add('d-none')
+                        }
+                        else {
+                            firstlist = 0
+                            maxList = totalListPage
+            
+                            firstPage.classList.add('d-none')
+                            firstSeparator.classList.add('d-none')
+            
+                            lastPage.classList.add('d-none')
+                            lastSeparator.classList.add('d-none')
+                        }
+                    }
+        
+                    for(let list = firstlist; list < maxList; list++){
+                        pagination += `
+                            <li class="page-item ${Number(list+1) == currentPageToNumber ? 'active' : ''} ${(list+1)}">
+                                <a class="page-link" href="${(querysearch) ? url + querysearch +'&page='+ Number(list+1) : url +'?page='+ Number(list+1)}">${list+1}</a>
+                            </li>
+                        `
+                    }
+        
+                    currentPageToNumber == 1 ? pagePrev.classList.add('page-item-disabled', 'disabled') : pagePrev.classList.remove('page-item-disabled', 'disabled')
+                    currentPageToNumber == totalListPage ? pageNext.classList.add('page-item-disabled', 'disabled') : pageNext.classList.remove('page-item-disabled', 'disabled')
+                    document.getElementById('paginationList').innerHTML = pagination
+                }
+            }else {
+                document.getElementById('pagination').innerHTML = ''
+            }
+        }
+        
+        // Function count total page pagination
+        function countLength() {
+            let loop = ''
+            let numDivider = 0
+            
+            for(let i = perPage; i <= Number(total) ; i++){
+                if (i % perPage === 0){
+                    loop++
+                    numDivider = i
+                }
+            }
+            totalListPage = (total - numDivider != 0) ? (loop + 1) : loop
+        }
+    </script>
+{% endblock %}

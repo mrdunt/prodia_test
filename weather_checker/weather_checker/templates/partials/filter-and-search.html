@@ -1,0 +1,19 @@
+<div class="row mb-4">
+    <div class="col-md-8">
+
+    </div>
+    <div class="col-md-4">
+        <form method="GET">
+            <div class="input-field">
+                <div class="form-group has-icon-left">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="{% if title %}{{ title }}{% else %}Cari...{% endif %}">
+                        <div class="form-control-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

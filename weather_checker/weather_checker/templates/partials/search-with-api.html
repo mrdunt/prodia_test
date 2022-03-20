@@ -1,0 +1,107 @@
+{% load static %}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+    </div>
+    <div class="col-md-4">
+        <div class="input-field position-relative">
+            <div class="form-group has-icon-left">
+                <div class="position-relative">
+                    <input type="text" id="search-suggest" class="form-control" name="q" onkeyup="searchSuggestion(this.value, event)" placeholder="Cari..." autocomplete="off">
+                    <div class="form-control-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestion -->
+            <div id="suggestionBox" class="suggestion-box d-none"></div>
+        </div>
+    </div>
+</div>
+
+{% block js %}
+<script type="text/javascript" src="{% static "assets/js/helpers.js" %}"></script>
+
+<script>
+    const suggestionBox = document.getElementById('suggestionBox')
+    const params = new URLSearchParams({
+        q: '',
+        type: '',
+    })
+    let url_search = ''
+
+    // If First Load
+    window.addEventListener("load", function(){
+        let getUrl = window.location.href
+        let formatUrl = new URL(getUrl)
+        
+        document.getElementById('search-suggest').value = formatUrl.searchParams.get("q")
+    })
+
+    // Function Search Suggestion
+    function searchSuggestion(value, event) {
+        if(event.keyCode == 13) {
+            url_search = "{% url 'backoffices:products:index' %}"
+            params.set('q', value)
+            params.set('type', '')
+            
+            searchNoSuggestion()
+        }else {
+            url_search = "{% url 'api:products:search_suggest' %}"
+
+            if(value.length > 0) {
+                apiSuggestion(`${url_search}?q=${value}`)
+            }else {
+                suggestionBox.classList.add('d-none')
+                suggestionBox.innerHTML = ''
+            }
+        }
+    }
+
+    // Function Hit API Suggestion
+    async function apiSuggestion(url) {
+        const response = await fetch(url)
+        if (response) {
+            var data = await response.json()
+
+            if(Object.keys(data).length > 0) {
+                setSuggestion(data)
+            }else {
+                suggestionBox.classList.add('d-none')
+                suggestionBox.innerHTML = ''
+            }
+        }
+    }
+
+    // Function Set Suggestion Response
+    function setSuggestion(data) {
+        let list = ''
+
+        list += '<ul>'
+        for (const [key, value] of Object.entries(data)) {
+            list += `<li onclick="searchFromSuggestion('${value}')">${value}</li>`
+        }
+        list += '</ul>'
+        
+        suggestionBox.innerHTML = list
+        suggestionBox.classList.remove('d-none')
+    }
+
+    // Function Search Not From Suggestion
+    function searchNoSuggestion() {
+        cleanParams(params)
+        window.location = `${url_search}?${params.toString()}`
+    }
+
+    // Function Search From Suggestion
+    function searchFromSuggestion(value) {
+        url_search = "{% url 'backoffices:products:index' %}"
+        params.set('q', value)
+        params.set('type', 'suggest')
+
+        cleanParams(params)
+        window.location = `${url_search}?${params.toString()}`
+    }
+</script>
+{% endblock %}

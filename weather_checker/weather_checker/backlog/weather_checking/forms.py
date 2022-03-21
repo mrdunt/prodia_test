@@ -40,7 +40,7 @@ class CheckWeatherForm(forms.Form):
                 "error": "error_checking",
                 "message": response_json.get('message')
             }
-
+            return response_json
         weather_info = {
                 "lat" : response_json.get('lat'),
                 "long": response_json.get('lon'),

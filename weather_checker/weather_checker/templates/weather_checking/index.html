@@ -44,6 +44,10 @@
                             <button type="submit" class="btn btn-primary">Check Weather</button>
                         </div>
                     </form>
+                    {% if weather_info %}
+                    <h3>Result</h3>
+                    <br>
+                    {% endif%}
                     {% for key, value in weather_info.items %}
                         <p>{{key}} : {{value}}</p>
                     {% endfor %}

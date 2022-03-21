@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="breadcrumb-header mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="">Weather Checker</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Area</li>
+        </ol>
+    </nav>
+
+
+    <div class="page-title mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">{{ title }}</h3>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                {% for field in form %} 
+                    {% include "partials/form_field.html" with field=field %}
+                {% endfor %}
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'backlog:areas:index' %}" class="me-3">
+                        <button type="button" class="btn btn-light">Back</button>
+                    </a>
+                    <button type="submit" class="btn btn-primary">{{ title }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include "partials/modal-table.html"%}
+{% endblock %}

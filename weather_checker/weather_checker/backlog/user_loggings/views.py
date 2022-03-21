@@ -9,9 +9,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from weather_checker.apps.user_loggings.models import UserLogging
+from weather_checker.backlog.decorators import login_required
 from weather_checker.utils import PaginatorPage
 
-
+@login_required
 def index(request):
     user_loggings = UserLogging.objects.all()
     paginator = PaginatorPage(user_loggings, request.GET.get('page', 1), step=20)  # type: ignore

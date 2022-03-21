@@ -23,7 +23,6 @@ def index(request):
                 error_message = response.get('message')
                 messages.error(request, error_message)
                 return redirect('weather_checker:weather_checking:index')
-            import pdb; pdb.set_trace()
             UserLogging.objects.create(
                 user=request.user,
                 result_meta=response

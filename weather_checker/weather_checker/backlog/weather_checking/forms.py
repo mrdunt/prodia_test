@@ -7,8 +7,6 @@ from django.utils import timezone
 
 from rest_framework import status
 
-
-
 class CheckWeatherForm(forms.Form):
 
     latitude = forms.CharField()
@@ -32,7 +30,7 @@ class CheckWeatherForm(forms.Form):
             'appid': api_key,
         }
         response_json = None
-
+        weather_info = None
         response = requests.get(url=url,
                                      params=request_params)
         response_json = json.loads(response.content.decode('utf-8'))
@@ -42,4 +40,15 @@ class CheckWeatherForm(forms.Form):
                 "error": "error_checking",
                 "message": response_json.get('message')
             }
-        return response_json
+
+        weather_info = {
+                "lat" : response_json.get('lat'),
+                "long": response_json.get('lon'),
+                "timezone": response_json.get('timezone'),
+                "pressure": response_json.get('current').get('pressure'),
+                "humidity": response_json.get('current').get('humidity'),
+                "wind_speed": response_json.get('current').get('wind_speed'),
+                "main": response_json.get('current').get('weather')[0].get('main'),
+                "description": response_json.get('current').get('weather')[0].get('description'),
+            }
+        return weather_info

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'weather_checker.apps.areas',
     'weather_checker.apps.users',
     'weather_checker.apps.user_loggings',

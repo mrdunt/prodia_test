@@ -17,19 +17,19 @@
                 <li class="sidebar-title">Menu</li>
 
                 <li class="sidebar-item {% if active_tab == 'province' %}active{% endif %}">
-                    <a href="" class='sidebar-link'>
+                    <a href="{% url 'weather_checker:areas:index' %}" class='sidebar-link'>
                         <i class="fa fa-globe fa-sm"></i>
                         <span>Area Info</span>
                     </a>
                 </li>
-                <li class="sidebar-item {% if active_tab == 'orders' %}active{% endif %}">
-                    <a href="" class='sidebar-link'>
+                <li class="sidebar-item {% if active_tab == 'weather_check' %}active{% endif %}">
+                    <a href="{% url 'weather_checker:weather_checking:index' %}" class='sidebar-link'>
                         <i class="fa fa-shopping-cart fa-sm"></i>
                         <span>Weather Check</span>
                     </a>
                 </li>
-                <li class="sidebar-item {% if active_tab == 'employee' %}active{% endif %}">
-                    <a href="" class='sidebar-link'>
+                <li class="sidebar-item {% if active_tab == 'user_logging' %}active{% endif %}">
+                    <a href="{% url 'weather_checker:user_loggings:index' %}" class='sidebar-link'>
                         <i class="bi bi-person-fill"></i>
                         <span>User Loggings</span>
                     </a>

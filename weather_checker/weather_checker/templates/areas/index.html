@@ -56,7 +56,7 @@
                                 <td>{{ province.long }}</td>
                                 <td>
                                     <div class="d-flex flex-nowrap">
-                                        <a href="">
+                                        <a href="{% url 'backlog:areas:update_area' id=province.id %}">
                                             <button class="btn btn-light-success btn-sm mx-1"><i class="fa fa-pencil-alt"></i></button>
                                         </a>
                                     </div>

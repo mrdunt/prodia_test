@@ -13,6 +13,7 @@ from weather_checker.backlog.areas.forms import CreateAreaForm
 from weather_checker.backlog.decorators import login_required
 from weather_checker.utils import PaginatorPage
 
+
 @login_required
 def index(request):
     provinces = Province.objects.all()
@@ -27,8 +28,10 @@ def index(request):
     }
     return render(request, 'areas/index.html', context)
 
+
+@login_required
 def create_area(request):
-    form = CreateAreaForm(data=request.POST or None)
+    form = CreateAreaForm(data=request.POST or None, instance=None)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -38,5 +41,22 @@ def create_area(request):
         'title': 'Create Area',
         'form': form,
         'active_tab': 'province',
+    }
+    return render(request, 'areas/area.html', context)
+
+
+@login_required
+def update_area(request, id):
+    existing_province = get_object_or_404(Province, id=id)
+    form = CreateAreaForm(data=request.POST or None, instance=existing_province)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Area telah berhasil diupdate')
+            return redirect('backlog:areas:index')
+    context = {
+        'form': form,
+        'active_tab': 'province',
+        'title': 'Update Province',
     }
     return render(request, 'areas/area.html', context)

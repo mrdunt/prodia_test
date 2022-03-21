@@ -152,6 +152,10 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Openweathermap API
+API_KEY = get_credential('API_KEY', '')
+OPEN_WEATHER_MAP_URL = get_credential('OPEN_WEATHER_MAP_URL', '')
+
 try:
     from .settings_local import *
 except ImportError:

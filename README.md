@@ -13,4 +13,4 @@ Prodia Test, Check current weather
 7. Create superuser for login with ```python manage.py createsuperuser``` and follow the instructions until done
 8. Ta-da ! You can start this project with ```python manage.py runserver```
 
-If something went wrong, don't hesitate email me danan@nr@gmail.com .
+If something went wrong, don't hesitate email me danan.nr@gmail.com .
